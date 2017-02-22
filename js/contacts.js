@@ -32,7 +32,7 @@ var contactManager = {
   addContact: function(e) {
     e.preventDefault();
 
-    $('main').append(templates.)
+    $('main').append(templates.newContact());
   },
 
   showContacts: function() {
