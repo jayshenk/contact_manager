@@ -29,24 +29,59 @@ var contactManager = {
     });
   },
 
+  lastId: 0,
+
   addContact: function(e) {
     e.preventDefault();
 
-    $('main').append(templates.newContact());
+    $('#new-contact form').get(0).reset();
+    $('#contacts').fadeOut();
+    $('#new-contact').fadeIn();
+  },
+
+  createContact: function(e) {
+    e.preventDefault();
+    this.lastId++;
+    var contact = { id: this.lastId };
+    var $form = $(e.target);
+    
+    $form.serializeArray().forEach(function(input) {
+      contact[input.name] = input.value;
+    });
+    this.contacts.push(contact);
+    if ($('#contacts ul').length) {
+      $('#contacts').find('ul').append(templates.contact(contact));
+    } else {
+      $('#contacts section').html(templates.contactList({ contacts: this.contacts }));
+    }
+    $('#new-contact').fadeOut();
+    $('#contacts').fadeIn();
   },
 
   showContacts: function() {
-    $('main').append(templates.contacts({ contacts: this.contacts }));
+    $('#contacts section').append(templates.contactList({ contacts: this.contacts }));
+    $('#contacts').slideDown();
+  },
+
+  cancel: function(e) {
+    e.preventDefault();
+    var $el = $(e.target);
+
+    $el.closest('form').get(0).reset();
+    $el.closest('.container').fadeOut();
+    $('#contacts').fadeIn();
   },
 
   bindEvents: function() {
-    $('main').on('click', '.add-contact', this.addContact.bind(this));
+    $('.add-contact').on('click', this.addContact.bind(this));
+    $('#new-contact form').on('submit', this.createContact.bind(this));
+    $('form').on('click', '.cancel', this.cancel.bind(this));
   },
 
   init: function() {
     this.cacheTemplates();
-    this.bindEvents();
     this.showContacts();
+    this.bindEvents();
   }
 }
 

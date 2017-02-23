@@ -17,8 +17,9 @@ h1 {
 }
 
 h2 {
+  text-align: center;
   font-size: 24px;
-  padding: 0 0 30px 0;
+  padding: 0 0 20px 0;
 }
 
 main {
@@ -27,9 +28,11 @@ main {
   margin: 0 auto;
 }
 
-div.container {
+.container {
+  display: none;
   width: 100%;
   position: absolute;
+  background: #fff;
 }
 
 main nav {
@@ -38,11 +41,56 @@ main nav {
   border-radius: 5px;
 }
 
+form {
+  max-width: 730px;
+  padding: 30px 0;
+  margin: 0 auto;
+  text-align: center;
+}
+
+form dl {
+  padding: 10px 0;
+}
+
+form dt {
+  display: inline-block;
+  width: 33%;
+  padding: 0 20px 0 0;
+  text-align: right;
+  font-weight: bold;
+  box-sizing: border-box;
+}
+
+form dd {
+  display: inline-block;
+  width: 66%;
+}
+
+form input[type=text] {
+  width: 100%;
+}
+
+form .controls {
+  padding: 20px 0;
+}
+
+input[type=submit] {
+  margin: 0 10px 0 0;
+  cursor: pointer;
+  background: #fff;
+}
+
 .button {
   display: inline-block;
+  text-decoration: none;
   color: #634b84;
   border: 1px solid #634b84;
   border-radius: 5px;
+}
+
+.button-large {
+  padding: 10px;
+  font-size: 18px;
 }
 
 .button:hover {
@@ -58,15 +106,9 @@ main nav {
   border-radius: 5px;
 }
 
-.add-contact {
-  padding: 10px;
-  font-size: 18px;
-  text-decoration: none;
-}
-
 input[type=text] {
   font: normal 14px Helvetica, Arial, sans-serif;
-  padding: 5px 10px;
+  padding: 10px;
   border: 1px solid #cecece;
   border-radius: 5px;
 }
