@@ -1,88 +1,92 @@
-var templates = [];
+$(function() {
+  var $contacts = $('#contacts');
+  var $list = $contacts.find('section');
+  var $newContact = $('#new-contact');
+  var templates = [];
 
-var Contact = {
-  id: 1,
-  name: '',
-  phone: '',
-  email: '',
+  var contactManager = {
+    contacts: [],
 
-  init: function(id, name, phone, email) {
-    this.id = id;
-    this.name = name;
-    this.phone = phone;
-    this.email = email;
-  }
-};
+    lastId: 0,
 
-var contactManager = {
-  contacts: [],
+    cacheTemplates: function() {
+      $("script[type='text/x-handlebars']").each(function() {
+        var $template = $(this);
+        templates[$template.attr('id')] = Handlebars.compile($template.html());
+      });
 
-  cacheTemplates: function() {
-    $("script[type='text/x-handlebars']").each(function() {
-      var $template = $(this);
-      templates[$template.attr('id')] = Handlebars.compile($template.html());
-    });
+      $('[data-type=partial]').each(function() {
+        var $partial = $(this);
+        Handlebars.registerPartial($partial.attr('id'), $partial.html());
+      });
+    },
 
-    $('[data-type=partial]').each(function() {
-      var $partial = $(this);
-      Handlebars.registerPartial($partial.attr('id'), $partial.html());
-    });
-  },
+    newContact: function(e) {
+      e.preventDefault();
 
-  lastId: 0,
+      $('#new-contact form').get(0).reset();
+      $contacts.fadeOut();
+      $newContact.fadeIn();
+    },
 
-  addContact: function(e) {
-    e.preventDefault();
+    addContact: function(contact) {
+      if ($contacts.find('ul').length) {
+        $contacts.find('ul').append(templates.contact(contact));
+      } else {
+        $list.html(templates.contactList({ contacts: this.contacts }));
+      }
+    },
 
-    $('#new-contact form').get(0).reset();
-    $('#contacts').fadeOut();
-    $('#new-contact').fadeIn();
-  },
+    createContact: function(e) {
+      e.preventDefault();
+      this.lastId++;
+      var contact = { id: this.lastId };
+      var $form = $(e.target);
+      
+      this.updateContact(contact, $form);
+      this.contacts.push(contact);
+      this.addContact(contact);
+      this.showContacts();
+    },
 
-  createContact: function(e) {
-    e.preventDefault();
-    this.lastId++;
-    var contact = { id: this.lastId };
-    var $form = $(e.target);
-    
-    $form.serializeArray().forEach(function(input) {
-      contact[input.name] = input.value;
-    });
-    this.contacts.push(contact);
-    if ($('#contacts ul').length) {
-      $('#contacts').find('ul').append(templates.contact(contact));
-    } else {
-      $('#contacts section').html(templates.contactList({ contacts: this.contacts }));
+    updateContact: function(contact, $form) {
+      $form.serializeArray().forEach(function(input) {
+        contact[input.name] = input.value;
+      });
+      return contact;
+    },
+
+    loadContacts: function() {
+      $list.append(templates.contactList({ contacts: this.contacts }));
+      $contacts.slideDown();
+    },
+
+    showContacts: function() {
+      $('.container:visible').fadeOut();
+      $contacts.fadeIn();
+    },
+
+    cancel: function(e) {
+      e.preventDefault();
+      var $el = $(e.target);
+
+      $el.closest('form').get(0).reset();
+      $el.closest('.container').fadeOut();
+      $contacts.fadeIn();
+    },
+
+    bindEvents: function() {
+      $('.add-contact').on('click', this.newContact.bind(this));
+      $newContact.find('form').on('submit', this.createContact.bind(this));
+      $('form').on('click', '.cancel', this.cancel.bind(this));
+    },
+
+    init: function() {
+      this.cacheTemplates();
+      this.loadContacts();
+      this.bindEvents();
     }
-    $('#new-contact').fadeOut();
-    $('#contacts').fadeIn();
-  },
-
-  showContacts: function() {
-    $('#contacts section').append(templates.contactList({ contacts: this.contacts }));
-    $('#contacts').slideDown();
-  },
-
-  cancel: function(e) {
-    e.preventDefault();
-    var $el = $(e.target);
-
-    $el.closest('form').get(0).reset();
-    $el.closest('.container').fadeOut();
-    $('#contacts').fadeIn();
-  },
-
-  bindEvents: function() {
-    $('.add-contact').on('click', this.addContact.bind(this));
-    $('#new-contact form').on('submit', this.createContact.bind(this));
-    $('form').on('click', '.cancel', this.cancel.bind(this));
-  },
-
-  init: function() {
-    this.cacheTemplates();
-    this.showContacts();
-    this.bindEvents();
   }
-}
 
-$(contactManager.init.bind(contactManager));
+  contactManager.init();
+});
