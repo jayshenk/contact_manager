@@ -58,7 +58,6 @@ $(function() {
 
     loadContacts: function() {
       this.contacts = JSON.parse(localStorage.getItem('contacts')) || [];
-      debugger;
       $list.append(templates.contactList({ contacts: this.contacts }));
       $contacts.slideDown();
     },
