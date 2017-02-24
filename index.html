@@ -67,10 +67,7 @@
       {{/each}}
       </ul>
       {{else}}
-      <div id="empty-contacts">
-        <h2>There are no contacts.</h2>
-        <a class="button button-large add-contact" href="#">Add Contact</a>
-      </div>
+      {{> emptyContacts}}
       {{/if}}
     </script>
 
@@ -88,6 +85,13 @@
         <a class="edit" href="#">Edit</a>
         <a class="delete" href="#">Delete</a>
       </li>
+    </script>
+
+    <script id="emptyContacts" data-type="partial" type="text/x-handlebars">
+      <div id="empty-contacts">
+        <h2>There are no contacts.</h2>
+        <a class="button button-large add-contact" href="#">Add Contact</a>
+      </div>
     </script>
   </body>
 </html> 

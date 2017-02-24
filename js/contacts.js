@@ -1,10 +1,12 @@
+var contactManager;
+
 $(function() {
   var $contacts = $('#contacts');
   var $list = $contacts.find('section');
   var $newContact = $('#new-contact');
   var templates = [];
 
-  var contactManager = {
+  contactManager = {
     contacts: [],
 
     lastId: 0,
@@ -67,6 +69,10 @@ $(function() {
       $contacts.fadeIn();
     },
 
+    emptyContacts: function() {
+      $list.append(templates.emptyContacts());
+    },
+
     cancel: function(e) {
       e.preventDefault();
       var $el = $(e.target);
@@ -74,6 +80,25 @@ $(function() {
       $el.closest('form').get(0).reset();
       $el.closest('.container').fadeOut();
       $contacts.fadeIn();
+    },
+
+    delete: function(e) {
+      e.preventDefault();
+      var $el = $(e.target);
+      var $li = $el.closest('li');
+      var id = $li.data('id');
+      
+      if (confirm('Are you sure?')) {
+        $li.remove();
+        this.destroy(id);        
+      }
+      if (!this.contacts.length) { this.emptyContacts(); }
+    },
+
+    destroy: function(idx) {
+      this.contacts = this.contacts.filter(function(contact) {
+        return contact.id !== idx;
+      });
     },
 
     save: function() {
@@ -84,6 +109,7 @@ $(function() {
       $('.add-contact').on('click', this.newContact.bind(this));
       $newContact.find('form').on('submit', this.createContact.bind(this));
       $('form').on('click', '.cancel', this.cancel.bind(this));
+      $contacts.on('click', 'a.delete', this.delete.bind(this));
       $(window).on('unload', this.save.bind(this));
     },
 
