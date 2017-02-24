@@ -22,6 +22,10 @@ h2 {
   padding: 0 0 20px 0;
 }
 
+h3 {
+  font-size: 24px;
+}
+
 main {
   position: relative;
   max-width: 1200px;
@@ -41,6 +45,23 @@ main nav {
   border-radius: 5px;
 }
 
+li {
+  display: inline-block;
+  width: 24%;
+  padding: 20px;
+  box-sizing: border-box;
+  border-bottom: 1px solid #f1f1f1;
+}
+
+dl {
+  padding: 20px 0;
+}
+
+dt {
+  padding: 5px 0;
+  font-weight: bold;
+}
+
 form {
   max-width: 730px;
   padding: 30px 0;
@@ -57,7 +78,6 @@ form dt {
   width: 33%;
   padding: 0 20px 0 0;
   text-align: right;
-  font-weight: bold;
   box-sizing: border-box;
 }
 
@@ -93,6 +113,11 @@ input[type=submit] {
   font-size: 18px;
 }
 
+.button-small {
+  margin: 0 10px 0 0;
+  padding: 5px 10px;
+}
+
 .button:hover {
   color: #fff;
   background: #634b84;
@@ -115,4 +140,25 @@ input[type=text] {
 
 #search {
   float: right;
+  width: 200px;
+}
+
+@media screen and (max-width: 990px) {
+  li { width: 32%; }
+}
+
+@media screen and (max-width: 760px) {
+  #search { 
+    display: block;
+    float: none;
+    margin-top: 10px;
+  }
+
+  li { display: block; }
+}
+
+@media screen and (max-width: 600px) {
+  main nav { padding: 20px; }
+
+  li { width: 100%; }
 }
