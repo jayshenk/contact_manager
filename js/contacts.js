@@ -32,7 +32,7 @@ $(function() {
     },
 
     addContact: function(contact) {
-      if ($contacts.find('ul').length) {
+      if ($contacts.find('li').length) {
         $contacts.find('ul').append(templates.contact(contact));
       } else {
         $list.html(templates.contactList({ contacts: this.contacts }));
@@ -106,7 +106,7 @@ $(function() {
     },
 
     bindEvents: function() {
-      $('.add-contact').on('click', this.newContact.bind(this));
+      $contacts.on('click', 'a.add-contact', this.newContact.bind(this));
       $newContact.find('form').on('submit', this.createContact.bind(this));
       $('form').on('click', '.cancel', this.cancel.bind(this));
       $contacts.on('click', 'a.delete', this.delete.bind(this));
