@@ -43,7 +43,7 @@ $(function() {
       var contact = { id: this.lastId };
       var $form = $(e.target);
       
-      this.updateContact(contact, $form);
+      contact = this.updateContact(contact, $form);
       this.contacts.push(contact);
       this.addContact(contact);
       this.showContacts();
@@ -57,6 +57,8 @@ $(function() {
     },
 
     loadContacts: function() {
+      this.contacts = JSON.parse(localStorage.getItem('contacts')) || [];
+      debugger;
       $list.append(templates.contactList({ contacts: this.contacts }));
       $contacts.slideDown();
     },
@@ -75,10 +77,15 @@ $(function() {
       $contacts.fadeIn();
     },
 
+    save: function() {
+      localStorage.setItem('contacts', JSON.stringify(this.contacts));
+    },
+
     bindEvents: function() {
       $('.add-contact').on('click', this.newContact.bind(this));
       $newContact.find('form').on('submit', this.createContact.bind(this));
       $('form').on('click', '.cancel', this.cancel.bind(this));
+      $(window).on('unload', this.save.bind(this));
     },
 
     init: function() {
