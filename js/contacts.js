@@ -1,9 +1,11 @@
 var contactManager;
 
 $(function() {
-  var $contacts = $('#contacts');
+  var $main = $('main');
+  var $contacts = $main.find('#contacts');
   var $list = $contacts.find('section');
-  var $newContact = $('#new-contact');
+  var $newContact = $main.find('#new-contact');
+  var $editContact = $main.find('#edit-contact');
   var templates = [];
 
   contactManager = {
@@ -26,7 +28,7 @@ $(function() {
     newContact: function(e) {
       e.preventDefault();
 
-      $('#new-contact form').get(0).reset();
+      $newContact.find('form').get(0).reset();
       $contacts.fadeOut();
       $newContact.fadeIn();
     },
@@ -44,10 +46,38 @@ $(function() {
       this.lastId++;
       var contact = { id: this.lastId };
       var $form = $(e.target);
-      
+
       contact = this.updateContact(contact, $form);
       this.contacts.push(contact);
       this.addContact(contact);
+      this.showContacts();
+    },
+
+    findContact: function(idx) {
+      return this.contacts.find(function(contact) {
+        return contact.id === idx;
+      });
+    },
+
+    edit: function(e) {
+      e.preventDefault();
+      var $el = $(e.target);
+      var id = $el.closest('li').data('id');
+      var contact = this.findContact(id);
+
+      $editContact.html(templates.edit(contact));
+      $editContact.fadeIn();
+      $contacts.fadeOut();
+    },
+
+    modify: function(e) {
+      e.preventDefault();
+      var $form = $(e.target);
+      var id = $form.data('id');
+      var contact = this.findContact(id);
+      
+      this.updateContact(contact, $form);
+      this.renderContacts();
       this.showContacts();
     },
 
@@ -58,10 +88,15 @@ $(function() {
       return contact;
     },
 
-    loadContacts: function() {
+    loadStorage: function() {
       this.contacts = JSON.parse(localStorage.getItem('contacts')) || [];
+      this.lastId = parseInt(localStorage.getItem('lastId'), 10);
       $list.append(templates.contactList({ contacts: this.contacts }));
       $contacts.slideDown();
+    },
+
+    renderContacts: function() {
+      $list.html(templates.contactList({ contacts: this.contacts }));
     },
 
     showContacts: function() {
@@ -103,19 +138,22 @@ $(function() {
 
     save: function() {
       localStorage.setItem('contacts', JSON.stringify(this.contacts));
+      localStorage.setItem('lastId', this.lastId);
     },
 
     bindEvents: function() {
       $contacts.on('click', 'a.add-contact', this.newContact.bind(this));
-      $newContact.find('form').on('submit', this.createContact.bind(this));
-      $('form').on('click', '.cancel', this.cancel.bind(this));
+      $newContact.on('submit', this.createContact.bind(this));
+      $editContact.on('submit', this.modify.bind(this));
+      $main.on('click', '.cancel', this.cancel.bind(this));
+      $contacts.on('click', 'a.edit', this.edit.bind(this));
       $contacts.on('click', 'a.delete', this.delete.bind(this));
       $(window).on('unload', this.save.bind(this));
     },
 
     init: function() {
       this.cacheTemplates();
-      this.loadContacts();
+      this.loadStorage();
       this.bindEvents();
     }
   }

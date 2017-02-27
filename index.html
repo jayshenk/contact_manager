@@ -57,6 +57,8 @@
           </fieldset>
         </form>
       </div>
+      <div id="edit-contact" class="container">
+      </div>
     </main>
 
     <script id="contactList" type="text/x-handlebars">
@@ -90,6 +92,42 @@
         <h2>There are no contacts.</h2>
         <a class="button button-large add-contact" href="#">Add Contact</a>
       </div>
+    </script>
+
+    <script id="edit" type="text/x-handlebars">
+      <form action="" method="post" data-id="{{id}}">
+        <fieldset>
+          <h2>Edit Contact</h2>
+          <dl>
+            <dt>
+              <label for="name">Full name:</label>
+            </dt>
+            <dd>
+              <input id="name" type="text" name="name" value="{{name}}" />
+            </dd>
+          </dl>
+          <dl>
+            <dt>
+              <label for="email">Email address:</label>
+            </dt>
+            <dd>
+              <input id="email" type="text" name="email" value="{{email}}" />
+            </dd>
+          </dl>
+          <dl>
+            <dt>
+              <label for="phone">Telephone number:</label>
+            </dt>
+            <dd>
+              <input id="phone" type="text" name="phone" value="{{phone}}" />
+            </dd>
+          </dl>
+          <div class="controls">
+            <input class="button button-large" type="submit" />
+            <a class="button button-large cancel" href="#">Cancel</a>
+          </div>
+        </fieldset>
+      </form>
     </script>
   </body>
 </html> 
