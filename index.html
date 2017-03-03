@@ -76,7 +76,7 @@
     </script>
 
     <script id="emptyContacts" data-type="partial" type="text/x-handlebars">
-      <div id="empty-contacts">
+      <div id="empty-contacts" class="message">
         <h2>There are no contacts.</h2>
         <a class="button button-large add-contact" href="#">Add Contact</a>
       </div>
@@ -196,6 +196,12 @@
         <a class="tag-name" href="#">{{.}}</a>
         <a class="remove-tag" href="#">delete</a>
       </li>
+    </script>
+
+    <script id="emptySearch" type="text/x-handlebars">
+      <div id="empty-search" class="message">
+        <h2>There are no contacts that match your search.</h2>
+      </div>
     </script>
   </body>
 </html> 

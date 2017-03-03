@@ -6,6 +6,7 @@ $(function() {
   var $contactList = $contacts.find('section');
   var $newContact = $main.find('#new-contact');
   var $editContact = $main.find('#edit-contact');
+  var $search = $contacts.find('#search');
   var $tags = $contacts.find('aside');
   var $tagList = $tags.find('ul');
   var $newTag = $tags.find('#new-tag');
@@ -206,16 +207,26 @@ $(function() {
       this.filterContacts();
     },
 
-    filterBySearch: function() {
+    setSearchTerm: function() {
+      this.searchTerm = $search.val();
+      this.filterContacts();
+    },
 
+    filterBySearch: function($li) {
+      var search = this.searchTerm;
+
+      return $li.filter(function() {
+        var contactName = $(this).find('h3').text();
+
+        return contactName.indexOf(search) !== -1;
+      });
     },
 
     filterByTag: function($li) {
       var tag = this.tagFilter;
 
       return $li.filter(function() {
-        var $this = $(this);
-        var contactTag = $this.find('.tag-name').text();
+        var contactTag = $(this).find('.tag-name').text();
 
         return contactTag === tag;
       });
@@ -223,11 +234,19 @@ $(function() {
 
     filterContacts: function() {
       var $li = $contactList.find('li');
+      var $emptySearch = $contactList.find('#empty-search');
 
       $li.hide();
       if (this.searchTerm) { $li = this.filterBySearch($li); }
       if (this.tagFilter) { $li = this.filterByTag($li); }
       $li.show();
+      if ($li.length) {
+        $emptySearch.remove();
+      } else {
+        if (!$emptySearch.length) {
+          $contactList.append(templates.emptySearch());
+        }
+      }
     },
 
     save: function() {
@@ -243,6 +262,7 @@ $(function() {
       $main.on('click', '.cancel', this.cancel.bind(this));
       $contacts.on('click', 'a.edit', this.edit.bind(this));
       $contacts.on('click', 'a.delete', this.delete.bind(this));
+      $search.on('keyup', this.setSearchTerm.bind(this));
       $tags.on('submit', this.createTag.bind(this));
       $tagList.on('click', 'a.tag-name', this.setTagFilter.bind(this));
       $tagList.on('click', 'a.remove-tag', this.removeTag.bind(this));
