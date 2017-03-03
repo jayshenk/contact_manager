@@ -69,7 +69,7 @@ $(function() {
       });
     },
 
-    edit: function(e) {
+    editContact: function(e) {
       e.preventDefault();
       var $el = $(e.target);
       var id = $el.closest('li').data('id');
@@ -83,7 +83,7 @@ $(function() {
       $contacts.fadeOut();
     },
 
-    modify: function(e) {
+    modifyContact: function(e) {
       e.preventDefault();
       var $form = $(e.target);
       var id = $form.data('id');
@@ -132,7 +132,7 @@ $(function() {
       $contacts.fadeIn();
     },
 
-    delete: function(e) {
+    deleteContact: function(e) {
       e.preventDefault();
       var $el = $(e.target);
       var $li = $el.closest('li');
@@ -140,12 +140,12 @@ $(function() {
       
       if (confirm('Are you sure?')) {
         $li.remove();
-        this.destroy(id);        
+        this.destroyContact(id);        
       }
       if (!this.contacts.length) { this.emptyContacts(); }
     },
 
-    destroy: function(idx) {
+    destroyContact: function(idx) {
       this.contacts = this.contacts.filter(function(contact) {
         return contact.id !== idx;
       });
@@ -258,10 +258,10 @@ $(function() {
     bindEvents: function() {
       $contacts.on('click', 'a.add-contact', this.newContact.bind(this));
       $newContact.on('submit', this.createContact.bind(this));
-      $editContact.on('submit', this.modify.bind(this));
+      $editContact.on('submit', this.modifyContact.bind(this));
       $main.on('click', '.cancel', this.cancel.bind(this));
-      $contacts.on('click', 'a.edit', this.edit.bind(this));
-      $contacts.on('click', 'a.delete', this.delete.bind(this));
+      $contacts.on('click', 'a.edit', this.editContact.bind(this));
+      $contacts.on('click', 'a.delete', this.deleteContact.bind(this));
       $search.on('keyup', this.setSearchTerm.bind(this));
       $tags.on('submit', this.createTag.bind(this));
       $tagList.on('click', 'a.tag-name', this.setTagFilter.bind(this));
