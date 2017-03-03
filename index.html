@@ -27,7 +27,7 @@
             <fieldset>
               <dl>
                 <dt><label for="new-tag">Add new tag:</label></dt>
-                <dl><input id="new-tag" type="text" name="tag" /></dl>
+                <dd><input id="new-tag" type="text" name="tag" /></dd>
               </dl>
               <input class="button button-small" type="submit" value="Add" />
             </fieldset>
@@ -117,6 +117,7 @@
             </dt>
             <dd>
               <select id="tag" name="tag">
+                <option selected value="">(none)</option>
                 {{#each tags}}
                 <option>{{.}}</option>
                 {{/each}}
@@ -170,6 +171,7 @@
                 {{#if contact.tag}}
                 <option selected>{{contact.tag}}</option>
                 {{/if}}
+                <option value="">(none)</option>
                 {{#each tags}}
                 <option>{{.}}</option>
                 {{/each}}

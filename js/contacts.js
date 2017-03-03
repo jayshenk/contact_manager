@@ -112,6 +112,7 @@ $(function() {
 
     renderContacts: function() {
       $contactList.html(templates.contactList({ contacts: this.contacts }));
+      this.filterContacts();
     },
 
     showContacts: function() {
@@ -274,7 +275,7 @@ $(function() {
       this.loadStorage();
       this.bindEvents();
     }
-  }
+  };
 
   contactManager.init();
 });

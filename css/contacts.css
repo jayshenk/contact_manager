@@ -129,8 +129,9 @@ aside form {
 
 aside dl { padding: 5px 0; }
 
-aside dt {
+aside dt, aside dd {
   width: 100%;
+  padding: 5px 0;
   text-align: left;
 }
 
