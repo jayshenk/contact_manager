@@ -93,7 +93,7 @@ form dd {
   text-align: left;
 }
 
-form input[type=text] {
+form input[type=text], form input[type=email] {
   width: 100%;
   box-sizing: border-box;
 }
@@ -175,7 +175,7 @@ aside a.active {
   border-radius: 5px;
 }
 
-input[type=text] {
+input[type=text], input[type=email] {
   font: normal 14px Helvetica, Arial, sans-serif;
   padding: 10px;
   border: 1px solid #cecece;
