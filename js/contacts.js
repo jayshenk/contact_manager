@@ -128,7 +128,6 @@ $(function() {
       e.preventDefault();
       var $el = $(e.target);
 
-      $el.closest('form').get(0).reset();
       $el.closest('.container').fadeOut();
       $contacts.fadeIn();
     },
