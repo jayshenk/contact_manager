@@ -3,15 +3,24 @@ var contactManager;
 $(function() {
   var $main = $('main');
   var $contacts = $main.find('#contacts');
-  var $list = $contacts.find('section');
+  var $contactList = $contacts.find('section');
   var $newContact = $main.find('#new-contact');
   var $editContact = $main.find('#edit-contact');
+  var $tags = $contacts.find('aside');
+  var $tagList = $tags.find('ul');
+  var $newTag = $tags.find('#new-tag');
   var templates = [];
 
   contactManager = {
     contacts: [],
 
     lastId: 0,
+
+    tags: [],
+
+    searchTerm: '',
+
+    tagFilter: '',
 
     cacheTemplates: function() {
       $("script[type='text/x-handlebars']").each(function() {
@@ -28,16 +37,16 @@ $(function() {
     newContact: function(e) {
       e.preventDefault();
 
-      $newContact.find('form').get(0).reset();
       $contacts.fadeOut();
+      $newContact.html(templates.new({ tags: this.tags }));
       $newContact.fadeIn();
     },
 
     addContact: function(contact) {
-      if ($contacts.find('li').length) {
-        $contacts.find('ul').append(templates.contact(contact));
+      if ($contactList.find('li').length) {
+        $contactList.find('ul').append(templates.contact(contact));
       } else {
-        $list.html(templates.contactList({ contacts: this.contacts }));
+        $contactList.html(templates.contactList({ contacts: this.contacts }));
       }
     },
 
@@ -64,8 +73,11 @@ $(function() {
       var $el = $(e.target);
       var id = $el.closest('li').data('id');
       var contact = this.findContact(id);
+      var otherTags = this.tags.filter(function(tag) {
+        return tag !== contact.tag;
+      });
 
-      $editContact.html(templates.edit(contact));
+      $editContact.html(templates.edit({ contact: contact, tags: otherTags }));
       $editContact.fadeIn();
       $contacts.fadeOut();
     },
@@ -91,12 +103,14 @@ $(function() {
     loadStorage: function() {
       this.contacts = JSON.parse(localStorage.getItem('contacts')) || [];
       this.lastId = parseInt(localStorage.getItem('lastId'), 10);
-      $list.append(templates.contactList({ contacts: this.contacts }));
+      this.tags = JSON.parse(localStorage.getItem('tags')) || [];
+      $contactList.html(templates.contactList({ contacts: this.contacts }));
+      $tagList.html(templates.tags({ tags: this.tags }));
       $contacts.slideDown();
     },
 
     renderContacts: function() {
-      $list.html(templates.contactList({ contacts: this.contacts }));
+      $contactList.html(templates.contactList({ contacts: this.contacts }));
     },
 
     showContacts: function() {
@@ -105,7 +119,7 @@ $(function() {
     },
 
     emptyContacts: function() {
-      $list.append(templates.emptyContacts());
+      $contactList.append(templates.emptyContacts());
     },
 
     cancel: function(e) {
@@ -136,9 +150,90 @@ $(function() {
       });
     },
 
+    findTag: function(tagName) {
+      return this.tags.find(function(tag) {
+        return tag === tagName;
+      });
+    },
+
+    createTag: function(e) {
+      e.preventDefault();
+      var tag = $newTag.val();
+
+      if (!tag.length || this.findTag(tag)) { return; }
+      this.tags.push(tag);
+      $tagList.append(templates.tag(tag));
+      $newTag.val('');
+    },
+
+    removeTag: function(e) {
+      e.preventDefault();
+      var $el = $(e.target);
+      var tag = $el.prev().text();
+
+      if (this.isTagUsedByContacts(tag)) {
+        alert("You cannot delete a tag that is used by a contact");
+      } else {
+        $el.closest('li').remove();
+        this.deleteTag(tag);
+      }
+    },
+
+    deleteTag: function(tagName) {
+      this.tags = this.tags.filter(function(tag) {
+        return tag !== tagName;
+      });
+    },
+
+    isTagUsedByContacts: function(tag) {
+      return this.contacts.some(function(contact) {
+        return contact.tag === tag;
+      });
+    },
+
+    setTagFilter: function(e) {
+      e.preventDefault();
+      var $link = $(e.target);
+
+      if ($link.hasClass('active')) {
+        $link.removeClass('active');
+        this.tagFilter = '';
+      } else {
+        $tagList.find('a.active').removeClass('active');
+        $link.addClass('active');
+        this.tagFilter = $link.text();
+      }
+      this.filterContacts();
+    },
+
+    filterBySearch: function() {
+
+    },
+
+    filterByTag: function($li) {
+      var tag = this.tagFilter;
+
+      return $li.filter(function() {
+        var $this = $(this);
+        var contactTag = $this.find('.tag-name').text();
+
+        return contactTag === tag;
+      });
+    },
+
+    filterContacts: function() {
+      var $li = $contactList.find('li');
+
+      $li.hide();
+      if (this.searchTerm) { $li = this.filterBySearch($li); }
+      if (this.tagFilter) { $li = this.filterByTag($li); }
+      $li.show();
+    },
+
     save: function() {
       localStorage.setItem('contacts', JSON.stringify(this.contacts));
       localStorage.setItem('lastId', this.lastId);
+      localStorage.setItem('tags', JSON.stringify(this.tags));
     },
 
     bindEvents: function() {
@@ -148,6 +243,9 @@ $(function() {
       $main.on('click', '.cancel', this.cancel.bind(this));
       $contacts.on('click', 'a.edit', this.edit.bind(this));
       $contacts.on('click', 'a.delete', this.delete.bind(this));
+      $tags.on('submit', this.createTag.bind(this));
+      $tagList.on('click', 'a.tag-name', this.setTagFilter.bind(this));
+      $tagList.on('click', 'a.remove-tag', this.removeTag.bind(this));
       $(window).on('unload', this.save.bind(this));
     },
 

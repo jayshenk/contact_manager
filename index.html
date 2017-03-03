@@ -19,43 +19,25 @@
           <a class="button button-large add-contact" href="#">Add Contact</a>
           <input id="search" type="text" name="search" placeholder="Search" />
         </nav>
+        <aside>
+          <h3>Tags</h3>
+          <ul>
+          </ul>
+          <form action="" method="post">
+            <fieldset>
+              <dl>
+                <dt><label for="new-tag">Add new tag:</label></dt>
+                <dl><input id="new-tag" type="text" name="tag" /></dl>
+              </dl>
+              <input class="button button-small" type="submit" value="Add" />
+            </fieldset>
+          </form>
+        </aside>
         <section>
         </section>
       </div>
       <div id="new-contact" class="container">
-        <form action="" method="post">
-          <fieldset>
-            <h2>Create Contact</h2>
-            <dl>
-              <dt>
-                <label for="name">Full name:</label>
-              </dt>
-              <dd>
-                <input id="name" type="text" name="name" />
-              </dd>
-            </dl>
-            <dl>
-              <dt>
-                <label for="email">Email address:</label>
-              </dt>
-              <dd>
-                <input id="email" type="text" name="email" />
-              </dd>
-            </dl>
-            <dl>
-              <dt>
-                <label for="phone">Telephone number:</label>
-              </dt>
-              <dd>
-                <input id="phone" type="text" name="phone" />
-              </dd>
-            </dl>
-            <div class="controls">
-              <input class="button button-large" type="submit" />
-              <a class="button button-large cancel" href="#">Cancel</a>
-            </div>
-          </fieldset>
-        </form>
+        
       </div>
       <div id="edit-contact" class="container">
       </div>
@@ -81,6 +63,12 @@
           <dd>{{phone}}</dd>
           <dt>Email</dt>
           <dd>{{email}}</dd>
+          <dt>Tag</dt>
+          {{#if tag}}
+          <dd class="tag-name">{{tag}}</dd>
+          {{else}}
+          <dd>(none)</dd>
+          {{/if}}
         </dl>
         <a class="button button-small edit" href="#">Edit</a>
         <a class="button button-small delete" href="#">Delete</a>
@@ -94,16 +82,16 @@
       </div>
     </script>
 
-    <script id="edit" type="text/x-handlebars">
-      <form action="" method="post" data-id="{{id}}">
+    <script id="new" type="text/x-handlebars">
+      <form action="" method="post">
         <fieldset>
-          <h2>Edit Contact</h2>
+          <h2>Create Contact</h2>
           <dl>
             <dt>
               <label for="name">Full name:</label>
             </dt>
             <dd>
-              <input id="name" type="text" name="name" value="{{name}}" />
+              <input id="name" type="text" name="name" />
             </dd>
           </dl>
           <dl>
@@ -111,7 +99,7 @@
               <label for="email">Email address:</label>
             </dt>
             <dd>
-              <input id="email" type="text" name="email" value="{{email}}" />
+              <input id="email" type="text" name="email" />
             </dd>
           </dl>
           <dl>
@@ -119,15 +107,95 @@
               <label for="phone">Telephone number:</label>
             </dt>
             <dd>
-              <input id="phone" type="text" name="phone" value="{{phone}}" />
+              <input id="phone" type="text" name="phone" />
             </dd>
           </dl>
+          {{#if tags}}
+          <dl>
+            <dt>
+              <label for="tag">Tag:</label>
+            </dt>
+            <dd>
+              <select id="tag" name="tag">
+                {{#each tags}}
+                <option>{{.}}</option>
+                {{/each}}
+              </select>
+            </dd>
+          </dl>
+          {{/if}}
           <div class="controls">
             <input class="button button-large" type="submit" />
             <a class="button button-large cancel" href="#">Cancel</a>
           </div>
         </fieldset>
       </form>
+    </script>
+
+    <script id="edit" type="text/x-handlebars">
+      <form action="" method="post" data-id="{{contact.id}}">
+        <fieldset>
+          <h2>Edit Contact</h2>
+          <dl>
+            <dt>
+              <label for="name">Full name:</label>
+            </dt>
+            <dd>
+              <input id="name" type="text" name="name" value="{{contact.name}}" />
+            </dd>
+          </dl>
+          <dl>
+            <dt>
+              <label for="email">Email address:</label>
+            </dt>
+            <dd>
+              <input id="email" type="text" name="email" value="{{contact.email}}" />
+            </dd>
+          </dl>
+          <dl>
+            <dt>
+              <label for="phone">Telephone number:</label>
+            </dt>
+            <dd>
+              <input id="phone" type="text" name="phone" value="{{contact.phone}}" />
+            </dd>
+          </dl>
+          {{#if tags}}
+          <dl>
+            <dt>
+              <label for="tag">Tag:</label>
+            </dt>
+            <dd>
+              <select id="tag" name="tag">
+                {{#if contact.tag}}
+                <option selected>{{contact.tag}}</option>
+                {{/if}}
+                {{#each tags}}
+                <option>{{.}}</option>
+                {{/each}}
+              </select>
+            </dd>
+          </dl>
+          {{/if}}
+          <div class="controls">
+            <input class="button button-large" type="submit" />
+            <a class="button button-large cancel" href="#">Cancel</a>
+          </div>
+        </fieldset>
+      </form>
+    </script>
+
+    <script id="tags" type="text/x-handlebars">
+      {{#each tags}}
+      {{> tag}}
+      {{/each}}
+    </script>
+
+    <script id="tag" data-type="partial" type="text/x-handlebars">
+      <li>
+        <a class="tag-name" href="#">{{.}}</a>
+        <a class="remove-tag" href="#">delete</a>
+      </li>
     </script>
   </body>
 </html> 

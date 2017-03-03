@@ -26,6 +26,8 @@ h3 {
   font-size: 24px;
 }
 
+a { text-decoration: none; }
+
 main {
   position: relative;
   max-width: 1200px;
@@ -42,10 +44,22 @@ main {
 main nav {
   padding: 20px 200px;
   background: #f1f1f1;
-  border-radius: 5px;
 }
 
-li {
+aside {
+  float: left;
+  width: 20%;
+  padding: 20px 30px;
+  box-sizing: border-box;
+  background: #f1f1f1;
+}
+
+section {
+  float: right;
+  width: 80%;
+}
+
+section li {
   display: inline-block;
   width: 24%;
   padding: 20px;
@@ -84,10 +98,18 @@ form dt {
 form dd {
   display: inline-block;
   width: 66%;
+  text-align: left;
 }
 
 form input[type=text] {
   width: 100%;
+  box-sizing: border-box;
+}
+
+form select {
+  width: 50%;
+  font: normal 14px Helvetica, Arial, sans-serif;
+  background: #fff;
 }
 
 form .controls {
@@ -98,6 +120,39 @@ input[type=submit] {
   margin: 0 10px 0 0;
   cursor: pointer;
   background: #fff;
+}
+
+aside form {
+  padding: 0;
+  text-align: left;
+}
+
+aside dl { padding: 5px 0; }
+
+aside dt {
+  width: 100%;
+  text-align: left;
+}
+
+aside ul {
+  padding: 10px 0;
+}
+
+aside li {
+  padding: 5px;
+  margin: 5px 0;
+}
+
+aside a.tag-name {
+  padding: 3px 5px;
+  color: #fff;
+  background: #634b84;
+  border-radius: 3px;
+}
+
+aside a.active {
+  color: #000;
+  background: yellow;
 }
 
 .button {
@@ -144,7 +199,7 @@ input[type=text] {
 }
 
 @media screen and (max-width: 990px) {
-  li { width: 32%; }
+  section li { width: 32%; }
 }
 
 @media screen and (max-width: 760px) {
@@ -154,11 +209,21 @@ input[type=text] {
     margin-top: 10px;
   }
 
-  li { display: block; }
+  aside {
+    display: block;
+    width: 100%;
+    padding: 20px 200px;
+  }
+
+  aside input[type=text] { width: auto; }
+
+  section li { display: block; }
 }
 
 @media screen and (max-width: 600px) {
   main nav { padding: 20px; }
 
-  li { width: 100%; }
+  aside { padding: 20px; }
+
+  section li { width: 100%; }
 }
