@@ -21,7 +21,7 @@
         </nav>
         <aside>
           <h3>Tags</h3>
-          <ul>
+          <ul id="tag-list">
           </ul>
           <form action="" method="post">
             <fieldset>
@@ -34,6 +34,8 @@
           </form>
         </aside>
         <section>
+          <ul id="contact-list">
+          </ul>
         </section>
       </div>
       <div id="new-contact" class="container">
@@ -44,11 +46,9 @@
 
     <script id="contactList" type="text/x-handlebars">
       {{#if contacts}}
-      <ul>
       {{#each contacts}}
       {{> contact}}
       {{/each}}
-      </ul>
       {{else}}
       {{> emptyContacts}}
       {{/if}}
