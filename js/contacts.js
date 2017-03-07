@@ -1,29 +1,82 @@
 var Contact;
 var Tag;
-var contactList;
-var tagList;
+var contacts;
+var tags;
 var manager;
 
 $(function() {
   var $main = $('main');
-  var $contacts = $main.find('#contacts');
-  var $newContact = $main.find('#new-contact');
-  var $editContact = $main.find('#edit-contact');
-  var $search = $contacts.find('#search');
-  var $newTag = $tags.find('#new-tag');
+  // var $search = $contacts.find('#search');
+  // var $newTag = $tags.find('#new-tag');
   var templates = {};
 
   Contact = {
+    update: function($form) {
+      $form.serializeArray().forEach(function(input) {
+        this[input.name] = input.value;
+      });
+    },
     init: function(id, $form) {
       this.id = id;
+      this.update($form);
     }
   },
 
-  contactList = {
-    $el: $contacts.find('#contact-list'),
+  contacts = {
+    $page: $main.find('#contacts'),
+    $el: $main.find('#contact-list'),
+    $new: $main.find('#new-contact'),
+    $edit: $main.find('#edit-contact'),
     collection: [],
     lastId: 0,
-    template: templates.contactList,
+    template: templates.contacts,
+    new: function(e) {
+      e.preventDefault();
+
+      this.$page.fadeOut();
+      $newContact.html(templates.new({ tags: tags.collection }));
+      $newContact.fadeIn();
+    },
+    add: function(contact) {
+      if (this.$el.find('li').length) {
+        this.$el.append(templates.contact(contact));
+      } else {
+        this.$el.html(templates.contactList({ contacts: this.contacts }));
+      }
+    },
+    create: function(e) {
+      e.preventDefault();
+      var $form = $(e.target);
+
+      this.lastId++;
+      contact = Object.create(Contact).init(this.lastId, $form)
+      this.collection.push(contact);
+      this.add(contact);
+      this.show();
+    },
+    edit: function(e) {
+      e.preventDefault();
+      var $el = $(e.target);
+      var id = $el.closest('li').data('id');
+      var contact = this.find(id);
+      var otherTags = tags.collection.filter(function(tag) {
+        return tag !== contact.tag;
+      });
+
+      this.$edit.html(templates.edit({ contact: contact, tags: otherTags }));
+      this.$edit.fadeIn();
+      this.$page.fadeOut();
+    },
+    modify: function(e) {
+      e.preventDefault();
+      var $form = $(e.target);
+      var id = $form.data('id');
+      var contact = this.find(id);
+      
+      contact.update($form);
+      this.render();
+      this.show();
+    },
     filter: function() {
 
     },
@@ -37,8 +90,15 @@ $(function() {
         return contact.id !== idx;
       });
     },
+    emptyMessage: function() {
+      this.$el.append(templates.emptyMessage());
+    },
     render: function() {
       this.$el.html(this.template({ contacts: this.collection }));
+    },
+    show: function() {
+      $('.container:visible').fadeOut();
+      this.$page.fadeIn();
     },
     load: function() {
       this.collection = JSON.parse(localStorage.getItem('contacts')) || [];
@@ -49,6 +109,8 @@ $(function() {
       localStorage.setItem('lastId', this.lastId);
     },
     bindEvents: function() {
+      $contacts.on('click', 'a.add-contact', this.new.bind(this));
+      $newContact.on('submit', this.create.bind(this));
 
     },
     init: function() {
@@ -56,12 +118,8 @@ $(function() {
     }
   },
 
-  Tag = {
-
-  },
-
-  tagList = {
-    $el: $contacts.find('#tag-list'),
+  tags = {
+    $el: contacts.$page.find('#tag-list'),
     collection: [],
     template: templates.tags,
     find: function(tagName) {
@@ -109,107 +167,27 @@ $(function() {
       });
     },
     save: function() {
-      contactList.save();
-      tagList.save();
+      contacts.save();
+      tags.save();
     },
     bindEvents: function() {
       $(window).on('unload', this.save.bind(this));
     },
     init: function() {
       this.cacheTemplates();
-      contactList.init();
-      tagList.init();
+      contacts.init();
+      tags.init();
       this.bindEvents();
     }
   },
 
   contactManager = {
 
-    searchTerm: '',
 
-    tagFilter: '',
 
-    
 
-    newContact: function(e) {
-      e.preventDefault();
 
-      $contacts.fadeOut();
-      $newContact.html(templates.new({ tags: this.tags }));
-      $newContact.fadeIn();
-    },
 
-    addContact: function(contact) {
-      if ($contactList.find('li').length) {
-        $contactList.find('ul').append(templates.contact(contact));
-      } else {
-        $contactList.html(templates.contactList({ contacts: this.contacts }));
-      }
-    },
-
-    createContact: function(e) {
-      e.preventDefault();
-      this.lastId++;
-      var contact = { id: this.lastId };
-      var $form = $(e.target);
-
-      contact = this.updateContact(contact, $form);
-      this.contacts.push(contact);
-      this.addContact(contact);
-      this.showContacts();
-    },
-
-    
-
-    editContact: function(e) {
-      e.preventDefault();
-      var $el = $(e.target);
-      var id = $el.closest('li').data('id');
-      var contact = this.findContact(id);
-      var otherTags = this.tags.filter(function(tag) {
-        return tag !== contact.tag;
-      });
-
-      $editContact.html(templates.edit({ contact: contact, tags: otherTags }));
-      $editContact.fadeIn();
-      $contacts.fadeOut();
-    },
-
-    modifyContact: function(e) {
-      e.preventDefault();
-      var $form = $(e.target);
-      var id = $form.data('id');
-      var contact = this.findContact(id);
-      
-      this.updateContact(contact, $form);
-      this.renderContacts();
-      this.showContacts();
-    },
-
-    updateContact: function(contact, $form) {
-      $form.serializeArray().forEach(function(input) {
-        contact[input.name] = input.value;
-      });
-      return contact;
-    },
-
-    loadStorage: function() {
-      $contacts.slideDown();
-    },
-
-    renderContacts: function() {
-      $contactList.html(templates.contactList({ contacts: this.contacts }));
-      this.filterContacts();
-    },
-
-    showContacts: function() {
-      $('.container:visible').fadeOut();
-      $contacts.fadeIn();
-    },
-
-    emptyContacts: function() {
-      $contactList.append(templates.emptyContacts());
-    },
 
     cancel: function(e) {
       e.preventDefault();
@@ -229,7 +207,7 @@ $(function() {
         $li.remove();
         this.destroyContact(id);        
       }
-      if (!this.contacts.length) { this.emptyContacts(); }
+      if (!this.contacts.length) { this.emptyMessage(); }
     },
 
     
@@ -322,11 +300,7 @@ $(function() {
       }
     },
 
-    
-
     bindEvents: function() {
-      $contacts.on('click', 'a.add-contact', this.newContact.bind(this));
-      $newContact.on('submit', this.createContact.bind(this));
       $editContact.on('submit', this.modifyContact.bind(this));
       $main.on('click', '.cancel', this.cancel.bind(this));
       $contacts.on('click', 'a.edit', this.editContact.bind(this));
