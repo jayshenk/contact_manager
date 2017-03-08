@@ -1,16 +1,14 @@
-var Contact;
-var Tag;
+var templates = {};
 var contacts;
-var tags;
 var manager;
+var tags;
 
 $(function() {
   var $main = $('main');
   // var $search = $contacts.find('#search');
   // var $newTag = $tags.find('#new-tag');
-  var templates = {};
 
-  Contact = {
+  var Contact = {
     update: function($form) {
       $form.serializeArray().forEach(function(input) {
         this[input.name] = input.value;
@@ -20,7 +18,7 @@ $(function() {
       this.id = id;
       this.update($form);
     }
-  },
+  };
 
   contacts = {
     $page: $main.find('#contacts'),
@@ -29,7 +27,6 @@ $(function() {
     $edit: $main.find('#edit-contact'),
     collection: [],
     lastId: 0,
-    template: templates.contacts,
     new: function(e) {
       e.preventDefault();
 
@@ -105,7 +102,7 @@ $(function() {
       this.lastId = parseInt(localStorage.getItem('lastId'), 10);
     },
     save: function() {
-      localStorage.setItem('contacts', JSON.stringify(this.contacts));
+      localStorage.setItem('contacts', JSON.stringify(this.collection));
       localStorage.setItem('lastId', this.lastId);
     },
     bindEvents: function() {
@@ -114,14 +111,16 @@ $(function() {
 
     },
     init: function() {
-
+      this.template = templates.contactList;
+      this.load();
+      this.render();
+      this.$page.slideDown();
     }
-  },
+  };
 
   tags = {
     $el: contacts.$page.find('#tag-list'),
     collection: [],
-    template: templates.tags,
     find: function(tagName) {
       return this.collection.find(function(tag) {
         return tag === tagName;
@@ -145,14 +144,15 @@ $(function() {
 
     },
     init: function() {
+      this.template = templates.tags;
       this.load();
     }
-  },
+  };
 
-  search = {
+  var search = {
     name: '',
     tag: '',
-  },
+  };
 
   manager = {
     cacheTemplates: function() {
@@ -161,7 +161,7 @@ $(function() {
         templates[$template.attr('id')] = Handlebars.compile($template.html());
       });
 
-      $('[data-type=partial]').each(function() {
+      $("[data-type='partial']").each(function() {
         var $partial = $(this);
         Handlebars.registerPartial($partial.attr('id'), $partial.html());
       });
@@ -179,16 +179,9 @@ $(function() {
       tags.init();
       this.bindEvents();
     }
-  },
+  };
 
-  contactManager = {
-
-
-
-
-
-
-
+  var contactManager = {
     cancel: function(e) {
       e.preventDefault();
       var $el = $(e.target);
@@ -209,9 +202,6 @@ $(function() {
       }
       if (!this.contacts.length) { this.emptyMessage(); }
     },
-
-    
-
     createTag: function(e) {
       e.preventDefault();
       var tag = $newTag.val();
