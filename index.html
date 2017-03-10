@@ -23,7 +23,7 @@
           <h3>Tags</h3>
           <ul id="tag-list">
           </ul>
-          <form action="" method="post">
+          <form id="add-tag" action="" method="post">
             <fieldset>
               <dl>
                 <dt><label for="new-tag">Add new tag:</label></dt>
@@ -62,12 +62,16 @@
           <dd>{{phone}}</dd>
           <dt>Email</dt>
           <dd>{{email}}</dd>
-          <dt>Tag</dt>
-          {{#if tag}}
-          <dd class="tag-name">{{tag}}</dd>
-          {{else}}
-          <dd>(none)</dd>
-          {{/if}}
+          <dt>Tags</dt>
+          <dd class="contact-tags">
+            {{#if tags}}
+            {{#each tags}}
+            {{.}}{{#unless @last}}, {{/unless}}
+            {{/each}}
+            {{else}}
+            (none)
+            {{/if}}
+          </dd>
         </dl>
         <a class="button button-small edit" href="#">Edit</a>
         <a class="button button-small delete" href="#">Delete</a>
@@ -75,8 +79,8 @@
     </script>
 
     <script id="emptyMessage" data-type="partial" type="text/x-handlebars">
-      <li>
-        <div id="empty-contacts" class="message">
+      <li id="empty-contacts">
+        <div class="message">
           <h2>There are no contacts.</h2>
           <a class="button button-large add-contact" href="#">Add Contact</a>
         </div>
@@ -87,6 +91,7 @@
       <form action="" method="post">
         <fieldset>
           <h2>Create Contact</h2>
+          <input id="id" type="hidden" name="id" value="{{id}}" />
           <dl>
             <dt>
               <label for="name">Full name:</label>
@@ -114,11 +119,10 @@
           {{#if tags}}
           <dl>
             <dt>
-              <label for="tag">Tag:</label>
+              <label for="tags">Tag:</label>
             </dt>
             <dd>
-              <select id="tag" name="tag">
-                <option selected value="">(none)</option>
+              <select id="tags" name="tags" multiple>
                 {{#each tags}}
                 <option>{{.}}</option>
                 {{/each}}
@@ -165,14 +169,15 @@
           {{#if tags}}
           <dl>
             <dt>
-              <label for="tag">Tag:</label>
+              <label for="tags">Tag:</label>
             </dt>
             <dd>
-              <select id="tag" name="tag">
-                {{#if contact.tag}}
-                <option selected>{{contact.tag}}</option>
+              <select id="tags" name="tags" multiple>
+                {{#if contact.tags}}
+                {{#each contact.tags}}
+                <option selected>{{.}}</option>
+                {{/each}}
                 {{/if}}
-                <option value="">(none)</option>
                 {{#each tags}}
                 <option>{{.}}</option>
                 {{/each}}
@@ -188,7 +193,7 @@
       </form>
     </script>
 
-    <script id="tags" type="text/x-handlebars">
+    <script id="tagList" type="text/x-handlebars">
       {{#each tags}}
       {{> tag}}
       {{/each}}

@@ -63,6 +63,11 @@ section li {
   border-bottom: 1px solid #f1f1f1;
 }
 
+#empty-contacts {
+  width: 100%;
+  border: none;
+}
+
 dl { padding: 20px 0; }
 
 dt {

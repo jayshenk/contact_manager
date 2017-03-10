@@ -8,17 +8,21 @@ $(function() {
   // var $search = $contacts.find('#search');
   // var $newTag = $tags.find('#new-tag');
 
-  var Contact = {
-    update: function($form) {
-      $form.serializeArray().forEach(function(input) {
-        this[input.name] = input.value;
-      });
-    },
-    init: function(id, $form) {
-      this.id = id;
-      this.update($form);
-    }
-  };
+  function getFormObject($form) {
+    var object = {};
+    var tags = [];
+
+    $form.serializeArray().forEach(function(input) {
+      var key = input.name;
+      var value = input.value;
+
+      if (key === 'id') { value = parseInt(value, 10); }
+      if (key === 'tags') { tags.push(value); }
+      object[key] = value;
+    });
+    object.tags = tags;
+    return object;
+  }
 
   contacts = {
     $page: $main.find('#contacts'),
@@ -30,23 +34,23 @@ $(function() {
     new: function(e) {
       e.preventDefault();
 
+      this.lastId++;
       this.$page.fadeOut();
-      $newContact.html(templates.new({ tags: tags.collection }));
-      $newContact.fadeIn();
+      this.$new.html(templates.new({ id: this.lastId, tags: tags.collection }));
+      this.$new.fadeIn();
     },
     add: function(contact) {
-      if (this.$el.find('li').length) {
-        this.$el.append(templates.contact(contact));
+      if (this.$el.find('#empty-contacts').length) {
+        this.$el.html(templates.contactList({ contacts: this.collection }));
       } else {
-        this.$el.html(templates.contactList({ contacts: this.contacts }));
+        this.$el.append(templates.contact(contact));
       }
     },
     create: function(e) {
       e.preventDefault();
       var $form = $(e.target);
 
-      this.lastId++;
-      contact = Object.create(Contact).init(this.lastId, $form)
+      contact = getFormObject($form);
       this.collection.push(contact);
       this.add(contact);
       this.show();
@@ -55,32 +59,44 @@ $(function() {
       e.preventDefault();
       var $el = $(e.target);
       var id = $el.closest('li').data('id');
-      var contact = this.find(id);
+      var contact = this.get(id);
       var otherTags = tags.collection.filter(function(tag) {
-        return tag !== contact.tag;
+        return contact.tags.indexOf(tag) === -1;
       });
 
       this.$edit.html(templates.edit({ contact: contact, tags: otherTags }));
       this.$edit.fadeIn();
       this.$page.fadeOut();
     },
-    modify: function(e) {
+    update: function(e) {
       e.preventDefault();
       var $form = $(e.target);
       var id = $form.data('id');
-      var contact = this.find(id);
+      var contact = this.get(id);
       
-      contact.update($form);
+      $.extend(contact, getFormObject($form));
       this.render();
       this.show();
     },
     filter: function() {
 
     },
-    find: function(idx) {
+    get: function(idx) {
       return this.collection.find(function(contact) {
         return contact.id === idx;
       });
+    },
+    delete: function(e) {
+      e.preventDefault();
+      var $el = $(e.target);
+      var $li = $el.closest('li');
+      var id = $li.data('id');
+      
+      if (confirm('Are you sure?')) {
+        $li.remove();
+        this.destroy(id);        
+      }
+      if (!this.collection.length) { this.emptyMessage(); }
     },
     destroy: function(idx) {
       this.collection = this.collection.filter(function(contact) {
@@ -97,6 +113,13 @@ $(function() {
       $('.container:visible').fadeOut();
       this.$page.fadeIn();
     },
+    cancel: function(e) {
+      e.preventDefault();
+      var $el = $(e.target);
+
+      $el.closest('.container').fadeOut();
+      this.$page.fadeIn();
+    },
     load: function() {
       this.collection = JSON.parse(localStorage.getItem('contacts')) || [];
       this.lastId = parseInt(localStorage.getItem('lastId'), 10);
@@ -106,29 +129,63 @@ $(function() {
       localStorage.setItem('lastId', this.lastId);
     },
     bindEvents: function() {
-      $contacts.on('click', 'a.add-contact', this.new.bind(this));
-      $newContact.on('submit', this.create.bind(this));
-
+      this.$page.on('click', 'a.add-contact', this.new.bind(this));
+      this.$el.on('click', 'a.edit', this.edit.bind(this));
+      this.$el.on('click', 'a.delete', this.delete.bind(this));
+      this.$new.on('submit', this.create.bind(this));
+      this.$edit.on('submit', this.update.bind(this));
+      $main.on('click', '.cancel', this.cancel.bind(this));
     },
     init: function() {
       this.template = templates.contactList;
       this.load();
       this.render();
+      this.bindEvents();
       this.$page.slideDown();
     }
   };
 
   tags = {
-    $el: contacts.$page.find('#tag-list'),
+    $el: $main.find('#tag-list'),
+    $form: $main.find('#add-tag'),
     collection: [],
-    find: function(tagName) {
+    get: function(tagName) {
       return this.collection.find(function(tag) {
         return tag === tagName;
       });
     },
+    create: function(e) {
+      e.preventDefault();
+      var $input = this.$form.find('#new-tag');
+      var tag = $input.val();
+
+      if (!tag.length || this.get(tag)) { return; }
+      this.collection.push(tag);
+      this.$el.append(templates.tag(tag));
+      $input.val('');
+    },
+    remove: function(e) {
+      e.preventDefault();
+      var $el = $(e.target);
+      var tag = $el.prev().text();
+
+      if (this.isInUse(tag)) {
+        alert("You cannot delete a tag that is used by a contact");
+      } else {
+        $el.closest('li').remove();
+        this.delete(tag);
+      }
+    },
     delete: function(tagName) {
       this.collection = this.collection.filter(function(tag) {
         return tag !== tagName;
+      });
+    },
+    isInUse: function(tagName) {
+      return contacts.collection.some(function(contact) {
+        return contact.tags.some(function(tag) {
+          return tag === tagName;
+        });
       });
     },
     render: function() {
@@ -141,11 +198,15 @@ $(function() {
       localStorage.setItem('tags', JSON.stringify(this.collection));
     },
     bindEvents: function() {
-
+      this.$form.on('submit', this.create.bind(this));
+      // this.$el.on('click', 'a.tag-name', this.setTagFilter.bind(this));
+      this.$el.on('click', 'a.remove-tag', this.remove.bind(this));
     },
     init: function() {
-      this.template = templates.tags;
+      this.template = templates.tagList;
       this.load();
+      this.render();
+      this.bindEvents();
     }
   };
 
@@ -182,56 +243,12 @@ $(function() {
   };
 
   var contactManager = {
-    cancel: function(e) {
-      e.preventDefault();
-      var $el = $(e.target);
 
-      $el.closest('.container').fadeOut();
-      $contacts.fadeIn();
-    },
 
-    deleteContact: function(e) {
-      e.preventDefault();
-      var $el = $(e.target);
-      var $li = $el.closest('li');
-      var id = $li.data('id');
-      
-      if (confirm('Are you sure?')) {
-        $li.remove();
-        this.destroyContact(id);        
-      }
-      if (!this.contacts.length) { this.emptyMessage(); }
-    },
-    createTag: function(e) {
-      e.preventDefault();
-      var tag = $newTag.val();
 
-      if (!tag.length || this.findTag(tag)) { return; }
-      this.tags.push(tag);
-      $tagList.append(templates.tag(tag));
-      $newTag.val('');
-    },
 
-    removeTag: function(e) {
-      e.preventDefault();
-      var $el = $(e.target);
-      var tag = $el.prev().text();
 
-      if (this.isTagUsedByContacts(tag)) {
-        alert("You cannot delete a tag that is used by a contact");
-      } else {
-        $el.closest('li').remove();
-        this.deleteTag(tag);
-      }
-    },
 
-    
-
-    isTagUsedByContacts: function(tag) {
-      return this.contacts.some(function(contact) {
-        return contact.tag === tag;
-      });
-    },
 
     setTagFilter: function(e) {
       e.preventDefault();
@@ -241,7 +258,7 @@ $(function() {
         $link.removeClass('active');
         this.tagFilter = '';
       } else {
-        $tagList.find('a.active').removeClass('active');
+        this.$el.find('a.active').removeClass('active');
         $link.addClass('active');
         this.tagFilter = $link.text();
       }
@@ -267,7 +284,7 @@ $(function() {
       var tag = this.tagFilter;
 
       return $li.filter(function() {
-        var contactTag = $(this).find('.tag-name').text();
+        var contactTag = $(this).find('.contact-tags').text();
 
         return contactTag === tag;
       });
@@ -291,14 +308,7 @@ $(function() {
     },
 
     bindEvents: function() {
-      $editContact.on('submit', this.modifyContact.bind(this));
-      $main.on('click', '.cancel', this.cancel.bind(this));
-      $contacts.on('click', 'a.edit', this.editContact.bind(this));
-      $contacts.on('click', 'a.delete', this.deleteContact.bind(this));
       $search.on('keyup', this.setSearchTerm.bind(this));
-      $tags.on('submit', this.createTag.bind(this));
-      $tagList.on('click', 'a.tag-name', this.setTagFilter.bind(this));
-      $tagList.on('click', 'a.remove-tag', this.removeTag.bind(this));
     },
 
   };
