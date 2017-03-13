@@ -77,9 +77,6 @@ $(function() {
       this.render();
       this.show();
     },
-    filter: function() {
-
-    },
     get: function(idx) {
       return this.collection.find(function(contact) {
         return contact.id === idx;
@@ -198,7 +195,6 @@ $(function() {
     },
     bindEvents: function() {
       this.$form.on('submit', this.create.bind(this));
-      // this.$el.on('click', 'a.tag-name', this.setTagFilter.bind(this));
       this.$el.on('click', 'a.remove-tag', this.remove.bind(this));
     },
     init: function() {
@@ -256,6 +252,7 @@ $(function() {
     run: function() {
       var $li = this.$contacts.find('li');
       var $emptySearch = this.$contacts.find('#empty-search');
+
       $li.hide();
       if (this.term) { $li = this.filterByTerm($li); }
       if (this.tag) { $li = this.filterByTag($li); }
