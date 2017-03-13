@@ -210,23 +210,21 @@ $(function() {
     $tags: tags.$el,
     $contacts: contacts.$el,
     term: '',
-    tag: '',
+    tags: [],
     setTerm: function() {
       this.term = this.$input.val();
       this.run();
     },
-    setTag: function(e) {
+    setTags: function(e) {
       e.preventDefault();
       var $link = $(e.target);
+      var tags = [];
 
-      if ($link.hasClass('active')) {
-        $link.removeClass('active');
-        this.tag = '';
-      } else {
-        this.$tags.find('a.active').removeClass('active');
-        $link.addClass('active');
-        this.tag = $link.text();
-      }
+      $link.toggleClass('active');
+      this.$tags.find('a.active').each(function() {
+        tags.push($(this).text());
+      });
+      this.tags = tags;
       this.run();
     },
     filterByTerm: function($li) {
@@ -238,14 +236,14 @@ $(function() {
         return contactName.indexOf(term) !== -1;
       });
     },
-    filterByTag: function($li) {
-      var tag = this.tag;
+    filterByTags: function($li) {
+      var tags = this.tags;
 
       return $li.filter(function() {
         var contactTags = $(this).find('.contact-tags').text().trim().split(', ');
 
-        return contactTags.some(function(tagName) {
-          return tagName === tag;
+        return tags.every(function(tag) {
+          return contactTags.indexOf(tag) !== -1;
         });
       });
     },
@@ -255,7 +253,7 @@ $(function() {
 
       $li.hide();
       if (this.term) { $li = this.filterByTerm($li); }
-      if (this.tag) { $li = this.filterByTag($li); }
+      if (this.tags) { $li = this.filterByTags($li); }
       $li.show();
       if ($li.length) {
         $emptySearch.remove();
@@ -267,7 +265,7 @@ $(function() {
     },
     bindEvents: function() {
       this.$input.on('keyup', this.setTerm.bind(this));
-      this.$tags.on('click', 'a.tag-name', this.setTag.bind(this));
+      this.$tags.on('click', 'a.tag-name', this.setTags.bind(this));
     },
     init: function() {
       this.bindEvents();
