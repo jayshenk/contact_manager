@@ -65,9 +65,7 @@
           <dt>Tags</dt>
           <dd class="contact-tags">
             {{#if tags}}
-            {{#each tags}}
-            {{.}}{{#unless @last}}, {{/unless}}
-            {{/each}}
+            {{#each tags}}{{.}}{{#unless @last}}, {{/unless}}{{/each}}
             {{else}}
             (none)
             {{/if}}
