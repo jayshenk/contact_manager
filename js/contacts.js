@@ -117,12 +117,12 @@ $(function() {
       this.$page.fadeIn();
     },
     load: function() {
-      this.collection = JSON.parse(localStorage.getItem('contacts')) || [];
-      this.lastId = parseInt(localStorage.getItem('lastId'), 10);
+      this.collection = JSON.parse(localStorage.getItem('contacts2')) || [];
+      this.lastId = parseInt(localStorage.getItem('lastId2'), 10) || 0;
     },
     save: function() {
-      localStorage.setItem('contacts', JSON.stringify(this.collection));
-      localStorage.setItem('lastId', this.lastId);
+      localStorage.setItem('contacts2', JSON.stringify(this.collection));
+      localStorage.setItem('lastId2', this.lastId);
     },
     bindEvents: function() {
       this.$page.on('click', 'a.add-contact', this.new.bind(this));
@@ -188,10 +188,10 @@ $(function() {
       this.$el.html(this.template({ tags: this.collection }));
     },
     load: function() {
-      this.collection = JSON.parse(localStorage.getItem('tags')) || [];
+      this.collection = JSON.parse(localStorage.getItem('tags2')) || [];
     },
     save: function() {
-      localStorage.setItem('tags', JSON.stringify(this.collection));
+      localStorage.setItem('tags2', JSON.stringify(this.collection));
     },
     bindEvents: function() {
       this.$form.on('submit', this.create.bind(this));
