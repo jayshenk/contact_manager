@@ -48,8 +48,8 @@ $(function() {
     create: function(e) {
       e.preventDefault();
       var $form = $(e.target);
+      var contact = getFormObject($form);
 
-      contact = getFormObject($form);
       this.collection.push(contact);
       this.add(contact);
       this.show();
